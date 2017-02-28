@@ -1,0 +1,234 @@
+<link rel="import" href="engine-view-styles.html" xmlns="http://www.w3.org/1999/html">
+
+<link rel="import" href="/bower_components/highcharts-chart/highcharts-chart.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="sparkplug-view-styles.html">
+
+<dom-module id="sparkplug-view">
+  <template>
+    <style include="sparkplug-view-styles">
+      :host {
+        position: relative;
+      }
+    </style>
+    <iron-ajax
+            id="sparkplugAjaxRequest"
+            last-response="{{sparkplug}}">
+    </iron-ajax>
+    <div class="layout">
+      <div class="layout__item u-1/2 borderless">
+        <div class="layout">
+          <div class="layout__item u-1/3 borderless">
+            <div class="left-side">
+              <div class="field-wrapper" style="font-size: 1.4rem">
+                <div>Spark Plug</div>
+              </div>
+              <div class="field-wrapper">
+                <div class="key">Manufacturer</div>
+                <div class="value">{{sparkplug.0.manufacturer}}</div>
+              </div>
+              <div class="field-wrapper">
+                <div class="key">Thread/Hex Size</div>
+                <div class="value">{{sparkplug.0.threadSize}}</div>
+              </div>
+              <div class="field-wrapper">
+                <div class="key">Part Number</div>
+                <div class="value">{{sparkplug.0.partNumber}}</div>
+              </div>
+              <div class="field-wrapper">
+                <div class="key">Gap</div>
+                <div class="value">{{sparkplug.0.gap}}</div>
+              </div>
+              <div class="field-wrapper">
+                <div class="key">Torque</div>
+                <div class="value">{{sparkplug.0.torque}}</div>
+              </div>
+              <div class="field-wrapper">
+                <div class="key">Last Service Date</div>
+                <div class="value">{{sparkplug.0.lastServiceDate}}</div>
+              </div>
+              <div class="field-wrapper">
+                <div class="key">Last Serviced By</div>
+                <div class="value">{{sparkplug.0.lastServicedBy}}</div>
+              </div>
+            </div>
+          </div>
+          <div class="layout__item u-2/3 borderless">
+            <div class="mainImage">
+              <img src={{imageUrl}} />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="layout__item u-1/2 borderless">
+        <div class="layout" style="padding: 2rem">
+            <highcharts-chart type="column" highchart-options="{{chartOptions1}}"></highcharts-chart>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer" style="position: absolute">
+      <a on-click="goToEngine" style="text-decoration: none; color: inherit; cursor: pointer;">
+        <i class=" u-mr-- nav-item--icon fa fa-caret-left"></i> Engine</a>
+    </div>
+  </template>
+
+
+  <script>
+    Polymer({
+      is: 'sparkplug-view',
+      properties: {
+
+        imageUrl: {
+          type: Object,
+          value: function () {
+            return "/images/sparkplug-outline.png";
+          }
+        },
+
+        chartOptions1: {
+          type: Object,
+          value: {
+            chart: {
+              backgroundColor: 'transparent'
+            },
+            legend: {
+              enabled: true,
+              align: 'left',
+              verticalAlign: 'top',
+              layout: 'horizontal',
+              backgroundColor: 'transparent',
+              shadow: false,
+              borderWidth: 0,
+              x: 0,
+              y: 0,
+              itemStyle: {
+                color: 'rgb(132, 151, 163)'
+              }
+            },
+            tooltip: {
+              enabled: false,
+              pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            title: {
+              text: ''
+            },
+            yAxis: {
+              max: 1000,
+              min: 0,
+              lineWidth: 1,
+              gridLineWidth: 1,
+              tickInterval: 200,
+              gridLineColor: 'rgb(54,76,89)',
+              title: {
+                text: 'Hours',
+                style: {
+                  color: 'rgb(132, 151, 163)'
+                }
+              },
+              tickWidth: 1,
+              labels: {
+                style: {
+                  color: 'rgb(132, 151, 163)'
+                }
+              }
+            },
+            xAxis: {
+              lineWidth: 1,
+              tickWidth: 1,
+              title: {
+                text: 'Spark Plug Position',
+                style: {
+                  color: 'rgb(132, 151, 163)'
+                }
+              },
+              labels: {
+                style: {
+                  color: 'rgb(132, 151, 163)'
+                }
+              },
+              categories: [
+                '1L',
+                '2L',
+                '3L',
+                '4L',
+                '5L',
+                '6L',
+                '1R',
+                '2R',
+                '3R',
+                '4R',
+                '5R',
+                '6R'
+              ]
+            },
+            plotOptions: {
+              column: {
+                stacking: 'normal',
+                borderWidth: 0
+              }
+            },
+            series: [{
+              name: 'In Good Shape',
+              color: 'rgb(50, 115, 22)',
+              data: [{
+                color: 'rgb(50, 115, 22)',
+                y: 970
+              }, {
+                color: 'rgb(50, 115, 22)',
+                y: 950
+              }, {
+                color: 'rgb(50, 115, 22)',
+                y: 810
+              }, {
+                color: 'rgb(50, 115, 22)',
+                y: 900
+              }, {
+                color: 'rgb(50, 115, 22)',
+                y: 960
+              }, {
+                color: 'rgb(50, 115, 22)',
+                y: 860
+              }, {
+                color: 'rgb(204, 155, 0)',
+                y: 420
+              }, {
+                color: 'rgb(204, 155, 0)',
+                y: 380
+              }, {
+                color: 'rgb(50, 115, 22)',
+                y: 650
+              }, {
+                color: 'rgb(50, 115, 22)',
+                y: 960
+              }, {
+                color: 'rgb(50, 115, 22)',
+                y: 970
+              }, {
+                color: 'rgb(50, 115, 22)',
+                y: 970
+              }]
+            }, {
+              name : 'Replace Soon',
+              color: 'rgb(204, 155, 0)'
+            }, {
+              name : 'Replace Now',
+              color: 'rgb(191, 48, 44)'
+            }]
+          }
+        }
+      },
+
+      refresh: function() {
+        debugger;
+        this.$.sparkplugAjaxRequest.url = '/predix-api/predix-asset/sparkplug?filter=parent=/engine/' + window.location.hash.split('/')[2];
+        this.$.sparkplugAjaxRequest.generateRequest();
+      },
+
+      goToEngine: function() {
+        seedApp.setRoute('engine/' + window.location.hash.split('/')[2]);
+      }
+    });
+  </script>
+</dom-module>

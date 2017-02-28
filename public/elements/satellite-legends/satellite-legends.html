@@ -1,0 +1,46 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="satellite-legends">
+    <template>
+        <style>
+            :host {
+                position: absolute;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.57);
+                padding: 0.5em;
+                margin: 1.5em;
+                color: #efeff4;
+            }
+
+            :host ul {
+                list-style-type: none;
+                padding-left: 1em;
+                margin: 0;
+            }
+
+            :host img {
+                height: 1.5em;
+                width: 1.5em;
+                float: left;
+                margin-bottom: 0.5em;
+                margin-right: 1em;
+            }
+        </style>
+
+        <ul>
+            <li><img src="../../images/map-pins/empty-square-pin.svg">Waukesha Twin</li><div style="clear:both"></div>
+            <li><img src="../../images/map-pins/empty-oval-pin.svg">Solar Twin</li><div style="clear:both"></div>
+            <li><img src="../../images/map-pins/green-circle.svg">Normal</li><div style="clear:both"></div>
+            <li><img src="../../images/map-pins/yellow-circle.svg">Caution</li><div style="clear:both"></div>
+            <li><img src="../../images/map-pins/red-circle.svg">Warning</li>
+        </ul>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'satellite-legends'
+        });
+    </script>
+
+</dom-module>

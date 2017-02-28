@@ -1,0 +1,73 @@
+<link rel="import" href="../../bower_components/google-map/google-map.html">
+<link rel="import" href="../satellite-legends/satellite-legends.html">
+
+<link rel="import" href="">
+
+<dom-module id="dt-engine-map">
+    <template>
+        <google-map id="gmap" mapTypeId="hybrid" zoom=2 latitude="20" longitude="5" style="width: calc(100% - 250px)">
+            <template is="dom-repeat" items="{{engines}}"> <!--{{getIcon(item.type)}}-->
+                <google-map-marker data="{{item}}" click-events="true" on-google-map-marker-click="onEngineClick" icon={{getIcon(item)}} latitude="{{item.location.lat}}" title={{item.description}} longitude="{{item.location.lng}}"></google-map-marker>
+            </template>
+        </google-map>
+        <satellite-legends></satellite-legends>
+    </template>
+    <script>
+        Polymer({
+            is: 'dt-engine-map',
+            properties: {
+                engines: {
+                    type: Array,
+                    value: []
+                },
+                mapOptions: {
+                    type: Object,
+                    value: {
+                        mapTypeId: "hybrid",
+                        labels: true,
+                        backgroundColor: "rgb(11,18,26)",
+                        disableDoubleClickZoom: true,
+                        streetViewControl: false
+                    }
+                }
+            },
+
+            attached: function() {
+              var _this = this;
+              document.getElementById('seedApp').addEventListener('routeChanged', function(e) {
+                    google.maps.event.trigger(_this.$.gmap.map, 'resize');
+                });
+            },
+
+            markerColorFromEngineType: function(type) {
+                return type == 'SolarPVSystem' ? 'yellow' : 'blue';
+            },
+            onEngineClick: function(e) {
+                seedApp.setRoute(e.target.data.uri.substring(1));
+            },
+            getIcon: function(item) {
+                var url;
+
+                var icon = null;
+                if(item.status ==='normal'){
+                    icon = 'green';
+                }else if(item.status ==='warning'){
+                    icon= 'yellow';
+                }else if(item.status ==='caution'){
+                    icon = 'red';
+                }else{ //if no status, mark icon as green
+                    icon = 'yellow';
+                }
+                if (item.type === 'SolarPVSystem') {
+                    icon = icon +'-oval-pin.png';
+                }else{
+                    icon = icon +'-square-pin.png';
+                }
+                url = '/images/map-pins/'+icon;
+                return {
+                    url: url
+                };
+            }
+        });
+    </script>
+</dom-module>

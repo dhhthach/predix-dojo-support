@@ -1,0 +1,225 @@
+<link rel="import" href="engine-view-styles.html">
+
+<link rel="import" href="/bower_components/px-percent-circle/px-percent-circle.html">
+<link rel="import" href="/bower_components/px-progress-bar/px-progress-bar.html">
+<link rel="import" href="/bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="/bower_components/iron-icon/iron-icon.html">
+
+<dom-module id="engine-view">
+  <template>
+    <style include="engine-view-styles">
+
+      .red {
+        --iron-icon-fill-color: rgb(241, 0, 26);
+      }
+
+      .orange {
+        --px-progress-bar-fill-color: #89343f;
+      }
+
+      :host ::shadow px-progress-bar #background {
+        background-color: rgb(54,76,89);
+      }
+
+
+    </style>
+    <iron-ajax
+            id="engineAjaxRequest"
+            last-response="{{engines}}">
+    </iron-ajax>
+
+    <div class="card" id="engineView" >
+      <div class="layout" style="padding: 20px; height: 590px">
+        <div class="layout__item u-1/4 borderless">
+          <div >
+            <!--<div style="font-size: x-large;">{{engines.0.type}}</div>-->
+            <template is="dom-if" if="{{_isPV(engines.0.type)}}">
+              <div style="font-size: x-large;">Solar PV System</div>
+            </template>
+            <template is="dom-if" if="{{_isWE(engines.0.type)}}">
+              <div style="font-size: x-large;">Waukesha Engine</div>
+            </template>
+            <div style="font-size: larger;">{{engines.0.modelNumber}}</div>
+            <div style="font-size: larger;">{{engines.0.location.address}}</div>
+          </div>
+          <div class="knowledge-view-popup">
+            <div style="font-size: 20px; font-weight:bold; padding: 8px;" id="contextLabel">Context</div>
+            <div style="padding: 8px">
+              <div class="layout">
+                <div class="layout__item u-1/2 borderless">
+                  <h4>Manufacturer</h4>
+                  <div class="assetInfo">{{engines.0.manufactuer}}</div>
+                  <h4>Asset Model</h4>
+                  <div class="assetInfo">{{engines.0.modelNumber}}</div>
+                  <h4>Serial Number</h4>
+                  <div class="assetInfo">{{engines.0.serialNumber}}</div>
+                </div>
+
+                <div class="layout__item u-1/2 borderless">
+                  <h4>Part Number</h4>
+                  <div class="assetInfo">{{engines.0.partNumber}}</div>
+                  <h4>Company</h4>
+                  <div class="assetInfo">{{engines.0.company}}</div>
+                  <h4>Description</h4>
+                  <div class="assetInfo">{{engines.0.description}}</div>
+                </div>
+              </div>
+              <div style="clear: both;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="layout__item u-1/2 borderless">
+          <div class="mainImage">
+            <div class="flip" on-click="flip" style="cursor:pointer;"><img style="height: 90vh" src="/images/engine.png"/></div>
+          </div>
+        </div>
+
+        <div class="layout__item u-1/4 borderless">
+          <div class="kpi-view-popup">
+            <div style="font-size: 20px;padding: 8px;font-weight:bold;" id="kpiLabel">KPIs</div>
+            <div style="padding: 8px">
+              <div class="layout">
+                <div class="layout__item u-1/2 borderless center">
+                  <h4 style="font-size: 17px">Availability</h4>
+                  <div class="assetInfo">
+                    <px-percent-circle val="{{availability}}" max="100" thickness="25" class="ringgreenpercentage ringsmall ringcenter"></px-percent-circle>
+                  </div>
+                  <h4 style="font-size: 17px">Uptime</h4>
+                  <div class="assetInfo">
+                    <px-percent-circle val="{{uptime}}" max="100" thickness="25" class="ringgreenpercentage ringsmall ringcenter"></px-percent-circle>
+                  </div>
+                </div>
+                <div class="layout__item u-1/2 borderless center">
+                    <h4 style="font-size: 17px">Reliability</h4>
+                    <div class="assetInfo">
+                      <px-percent-circle val="{{reliability}}" max="100" thickness="25" class="ringgreenpercentage ringsmall ringcenter"></px-percent-circle>
+                    </div>
+                    <h4 style="font-size: 17px">Utilization</h4>
+                    <div class="assetInfo">
+                      <px-percent-circle val="{{utilization}}" max="100" thickness="25" class="ringgreenpercentage ringsmall ringcenter"></px-percent-circle>
+                    </div>
+                </div>
+              </div>
+              <div style="clear: both;"></div>
+            </div>
+          </div>
+
+          <div class="insight-view-popup">
+            <div style="font-size: 20px;padding: 8px;font-weight:bold;" id="insightLabel">Insights</div>
+            <div style="padding: 8px">
+              <div class="layout">
+                <div class="layout__item borderless">
+                    <h4>Probability of Fault: {{p2016}}%</h4>
+                    <div class="assetInfo">
+                      <px-progress-bar value="{{p2016}}" class="orange"></px-progress-bar>
+                    </div>
+                    <!--<template is="dom-if" if="{{_isWEError(url)}}">-->
+                      <h4>Spark Plug Life</h4>
+                      <div class="" style="font-size: 1.2em">
+                        <i class="warning-icon fa fa-exclamation-triangle"></i>&nbsp; Replace plug 5R within {{remainingDays}} days
+                      </div>
+                    <!--</template>-->
+                </div>
+              </div>
+              <div style="clear: both;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-left: 1.2em">
+        <a class="partButton" on-click="goToSparkplug" style="cursor: pointer">
+          <img height="50px" src="/images/button-sparkplug.png"/>
+        </a>
+      </div>
+      <div class="footer">
+        <a href="#/dashboards" style="text-decoration: none; color: inherit;"><i class=" u-mr-- nav-item--icon fa fa-caret-left"></i> All Twins</a>
+      </div>
+    </div>
+  </template>
+
+
+  <script>
+    Polymer({
+      is: 'engine-view',
+      properties: {
+        remainingDays: {
+          type: Number,
+          value: function() {
+            return new Date() < new Date('11/16/2016') ? 4 : 3;
+          }
+        },
+        engine: {
+          type: Object
+        },
+        engines: {
+          type: Object //Array
+        },
+        engineUrl: {
+          type: Object,
+          value: function () {
+            return '/predix-api/predix-asset'
+              + window.location.hash.replace('#', '');
+          }
+        }
+      },
+
+      refresh: function() {
+        this.$.engineAjaxRequest.url = '/predix-api/predix-asset' + window.location.hash.replace('#', '');
+        this.$.engineAjaxRequest.generateRequest();
+        this.init();
+      },
+
+      init: function (e) {
+        this.url = window.location.hash;
+        this.availability = 0;
+        this.uptime = 0;
+        this.reliability = 0;
+        this.utilization = 0;
+        this.p2016 = 0;
+
+        this.animationLoad('availability', 97);
+        this.animationLoad('uptime', 100);
+        this.animationLoad('reliability', 98);
+        this.animationLoad('utilization', 97);
+        this.animationLoad('p2016', 10);
+
+      },
+
+      animationLoad: function (prop, value) {
+        var _this = this;
+        (function increase(i){
+          if (_this[prop] >= value) return;
+          _this[prop] = i + 1;
+          setTimeout(increase.bind(null, i+1), 1000/value);
+        })(1);
+      },
+
+      _computeTimeseriesBody: function (engine) {
+        return  {
+          start: '1y-ago',
+          tags: [
+            {
+              name: engine[0].type == 'WaukeshaEngine' ? 'Lube Oil Pressure' : 'DC Current',
+              order: 'desc',
+              filters: {
+                attributes: {
+                  AssetUri: window.location.hash.replace('#', '')
+                  //'/engine/2afbd553-8d7f-4c59-8346-d93a92b177ba'//window.location.hash.replace('#', '')
+                }
+              }
+            }
+          ]
+        }
+      },
+
+      _isWEError: function(url) {
+        return url.indexOf('cb27ef1b-b0de-494d-877f-32e95b757651') !== -1;
+      },
+
+      goToSparkplug: function() {
+        seedApp.setRoute('sparkplug/' + window.location.hash.split('/')[2]);
+      }
+
+    });
+  </script>
+</dom-module>
