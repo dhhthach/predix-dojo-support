@@ -10,7 +10,7 @@
                 <google-map-marker data="{{item}}" click-events="true" on-google-map-marker-click="onEngineClick" icon={{getIcon(item)}} latitude="{{item.location.lat}}" title={{item.description}} longitude="{{item.location.lng}}"></google-map-marker>
             </template>
         </google-map>
-        <satellite-legends></satellite-legends>
+        <!--<satellite-legends></satellite-legends>-->
     </template>
     <script>
         Polymer({
@@ -49,21 +49,17 @@
                 var url;
 
                 var icon = null;
-                if(item.status ==='normal'){
-                    icon = 'green';
-                }else if(item.status ==='warning'){
-                    icon= 'yellow';
-                }else if(item.status ==='caution'){
+
+                if (item.flag) {
                     icon = 'red';
-                }else{ //if no status, mark icon as green
-                    icon = 'yellow';
+                } else {
+                    icon = 'green';
                 }
-                if (item.type === 'SolarPVSystem') {
-                    icon = icon +'-oval-pin.png';
-                }else{
-                    icon = icon +'-square-pin.png';
-                }
+
+                icon = icon + '-square-pin.png';
+
                 url = '/images/map-pins/'+icon;
+
                 return {
                     url: url
                 };

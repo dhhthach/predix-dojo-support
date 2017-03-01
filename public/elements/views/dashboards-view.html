@@ -11,8 +11,12 @@
     <iron-ajax
             id="engineIronAjax"
             url="/predix-api/predix-asset/engine"
-            last-response="{{engines}}"
+            on-response="handleEngineResponse"
             auto>
+    </iron-ajax>
+
+    <iron-ajax
+      id="markedEngineRequest">
     </iron-ajax>
 
     <div id="filterPanel">
@@ -23,7 +27,7 @@
       </ul>
     </div>
     <template is="dom-if" if="[[!_knowledgeGraphClicked]]">
-      <dt-engine-map engines="{{engines}}" ></dt-engine-map>
+      <dt-engine-map engines="{{_computedEngines}}" ></dt-engine-map>
     </template>
     <template is="dom-if" if="[[_knowledgeGraphClicked]]">
       <iframe frameborder="0" src="https://graphdemo-mm.run.aws-usw02-pr.ice.predix.io/#/"></iframe>
@@ -50,8 +54,17 @@
         },
         engines: {
           type: Array,
-          value: []
+          value: function() {
+            return [];
+          }
         },
+        _computedEngines: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+
         _knowledgeGraphClicked: {
           type: Boolean,
           value: false
@@ -79,9 +92,28 @@
           : this.$.engineIronAjax.params = {filter: ''};
       },
 
-      refresh: function() {
-        //this.init();
-//        google.maps.event.trigger(_this.$.gmap.map, 'resize');
+      _updateEngines: function(gaziruId) {
+        this.$.markedEngineRequest.url = '/predix-api/predix-asset/engine?filter=gaziruId=' + gaziruId + '>parent';
+        this.$.markedEngineRequest.generateRequest().completes.then((function(e) {
+
+          e.response[0].flag = true;
+
+          var tempEngines = this.engines.slice();
+
+          this.set('_computedEngines', tempEngines);
+
+          var index = tempEngines.findIndex(function(i) {
+            return i.uri === e.response[0].uri;
+          });
+
+          this.set('_computedEngines.' + index, e.response[0]);
+
+        }).bind(this));
+      },
+
+      handleEngineResponse: function(e) {
+        this.set('engines', e.detail.response);
+        this.set('_computedEngines', e.detail.response);
       }
 
     });

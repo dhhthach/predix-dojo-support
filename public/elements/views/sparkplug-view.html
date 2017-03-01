@@ -14,7 +14,8 @@
     </style>
     <iron-ajax
             id="sparkplugAjaxRequest"
-            last-response="{{sparkplug}}">
+            last-response="{{sparkplug}}"
+            on-response="handleSparkPlugResponse">
     </iron-ajax>
     <div class="layout">
       <div class="layout__item u-1/2 borderless">
@@ -44,14 +45,6 @@
                 <div class="key">Torque</div>
                 <div class="value">{{sparkplug.0.torque}}</div>
               </div>
-              <div class="field-wrapper">
-                <div class="key">Last Service Date</div>
-                <div class="value">{{sparkplug.0.lastServiceDate}}</div>
-              </div>
-              <div class="field-wrapper">
-                <div class="key">Last Serviced By</div>
-                <div class="value">{{sparkplug.0.lastServicedBy}}</div>
-              </div>
             </div>
           </div>
           <div class="layout__item u-2/3 borderless">
@@ -63,7 +56,8 @@
       </div>
       <div class="layout__item u-1/2 borderless">
         <div class="layout" style="padding: 2rem">
-            <highcharts-chart type="column" highchart-options="{{chartOptions1}}"></highcharts-chart>
+          <highcharts-chart type="column" highchart-options="{{chartOptions1}}"></highcharts-chart>
+          <i class="warning-icon fa fa-exclamation-triangle" style="vertical-align: middle;"></i>&nbsp; ID 391 found!
         </div>
       </div>
     </div>
@@ -80,6 +74,11 @@
       is: 'sparkplug-view',
       properties: {
 
+        oldGaziruIdIndex: {
+          type: Number,
+          value: -1
+        },
+
         imageUrl: {
           type: Object,
           value: function () {
@@ -94,22 +93,16 @@
               backgroundColor: 'transparent'
             },
             legend: {
-              enabled: true,
-              align: 'left',
-              verticalAlign: 'top',
-              layout: 'horizontal',
-              backgroundColor: 'transparent',
-              shadow: false,
-              borderWidth: 0,
-              x: 0,
-              y: 0,
-              itemStyle: {
-                color: 'rgb(132, 151, 163)'
-              }
+              enabled: false
             },
             tooltip: {
               formatter: function() {
-                return '<b>PartNum: </b>' + this.point.partNum;
+                return '<b>Rod Type: </b>' + this.point.manufacture.rodType + '<br/>'
+                  + '<b>Type: </b>' + this.point.manufacture.type + '<br/>'
+                  + '<b>Supplier: </b>' + this.point.manufacture.supplier + '<br/>'
+                  + '<b>Cut On: </b>' + this.point.manufacture.cutOn + '<br>'
+                  + '<b>Install Date: </b>' + this.point.manufacture.installDate + '<br/>'
+                  + '<b>Operator: </b>' + this.point.manufacture.operator + '<br/>';
               }
             },
             title: {
@@ -139,27 +132,14 @@
               lineWidth: 1,
               tickWidth: 1,
               title: {
-                text: ''
+                text: 'Gaziru Ids'
               },
               labels: {
                 style: {
                   color: 'rgb(132, 151, 163)'
                 }
               },
-              categories: [
-                '1234567L',
-                '1234567L',
-                '1234567L',
-                '1234567L',
-                '1234567L',
-                '1234567L',
-                '1234567L',
-                '1234567L',
-                '1234567L',
-                '1234567L',
-                '1234567L',
-                '1234567L'
-              ]
+              categories: []
             },
             plotOptions: {
               column: {
@@ -168,66 +148,80 @@
               }
             },
             series: [{
-              name: 'In Good Shape',
-              color: 'rgb(50, 115, 22)',
               data: [{
                 color: 'rgb(50, 115, 22)',
-                y: 970,
-                partNum: 123
+                y: 0
               }, {
                 color: 'rgb(50, 115, 22)',
-                y: 950
+                y: 0
               }, {
                 color: 'rgb(50, 115, 22)',
-                y: 810
+                y: 0
               }, {
                 color: 'rgb(50, 115, 22)',
-                y: 900
+                y: 0
               }, {
                 color: 'rgb(50, 115, 22)',
-                y: 960
+                y: 0
               }, {
                 color: 'rgb(50, 115, 22)',
-                y: 860
-              }, {
-                color: 'rgb(204, 155, 0)',
-                y: 420
-              }, {
-                color: 'rgb(204, 155, 0)',
-                y: 380
+                y: 0
               }, {
                 color: 'rgb(50, 115, 22)',
-                y: 650
+                y: 0
               }, {
                 color: 'rgb(50, 115, 22)',
-                y: 960
+                y: 0
               }, {
                 color: 'rgb(50, 115, 22)',
-                y: 970
+                y: 0
               }, {
                 color: 'rgb(50, 115, 22)',
-                y: 970
+                y: 0
+              }, {
+                color: 'rgb(50, 115, 22)',
+                y: 0
+              }, {
+                color: 'rgb(50, 115, 22)',
+                y: 0
               }]
-            }, {
-              name : 'Replace Soon',
-              color: 'rgb(204, 155, 0)'
-            }, {
-              name : 'Replace Now',
-              color: 'rgb(191, 48, 44)'
             }]
           }
         }
       },
 
       refresh: function() {
-        debugger;
         this.$.sparkplugAjaxRequest.url = '/predix-api/predix-asset/sparkplug?filter=parent=/engine/' + window.location.hash.split('/')[2];
         this.$.sparkplugAjaxRequest.generateRequest();
       },
 
       goToEngine: function() {
         seedApp.setRoute('engine/' + window.location.hash.split('/')[2]);
+      },
+
+      handleSparkPlugResponse: function(e) {
+        var chart = document.querySelector('highcharts-chart')._chart;
+
+        e.detail.response.forEach(function(e, i) {
+          e.y = Number(e.deprivedHours);
+          chart.series[0].data[i].update(e, false);
+        });
+
+        chart.xAxis[0].setCategories(e.detail.response.map(function(r) {
+          return r.gaziruId;
+        }), true);
+      },
+
+      updateColorById: function(id) {
+        var chart = document.querySelector('highcharts-chart')._chart;
+        var index = chart.xAxis[0].categories.indexOf('' + id);
+        if (index !== -1) {
+          if (this.oldGaziruIdIndex >= 0) chart.series[0].data[this.oldGaziruIdIndex].update({color: 'rgb(50, 155, 22)'}, true);
+          chart.series[0].data[index].update({color: 'rgb(50, 50, 122)'}, true);
+          this.oldGaziruIdIndex = index;
+        }
       }
+
     });
   </script>
 </dom-module>
