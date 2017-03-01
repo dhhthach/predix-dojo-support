@@ -42,7 +42,9 @@
     "px-highchart-gauge": "https://bitbucket.org/fptge/px-highchart-gauge.git",
     "highcharts-chart": "^1.1.5",
     "px-progress-bar": "^0.1.3",
-    "px-box-design": "^0.4.4"
+    "px-box-design": "^0.4.4",
+    "stomp-client": "https://github.com/lumue/polymer-stomp-client.git#master",
+    "google-map": "^1.2.0"
   },
   "devDependencies": {
     "px-forms-design": "^1.1.1",

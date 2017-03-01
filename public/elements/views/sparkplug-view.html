@@ -108,8 +108,9 @@
               }
             },
             tooltip: {
-              enabled: false,
-              pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+              formatter: function() {
+                return '<b>PartNum: </b>' + this.point.partNum;
+              }
             },
             title: {
               text: ''
@@ -138,10 +139,7 @@
               lineWidth: 1,
               tickWidth: 1,
               title: {
-                text: 'Spark Plug Position',
-                style: {
-                  color: 'rgb(132, 151, 163)'
-                }
+                text: ''
               },
               labels: {
                 style: {
@@ -149,18 +147,18 @@
                 }
               },
               categories: [
-                '1L',
-                '2L',
-                '3L',
-                '4L',
-                '5L',
-                '6L',
-                '1R',
-                '2R',
-                '3R',
-                '4R',
-                '5R',
-                '6R'
+                '1234567L',
+                '1234567L',
+                '1234567L',
+                '1234567L',
+                '1234567L',
+                '1234567L',
+                '1234567L',
+                '1234567L',
+                '1234567L',
+                '1234567L',
+                '1234567L',
+                '1234567L'
               ]
             },
             plotOptions: {
@@ -174,7 +172,8 @@
               color: 'rgb(50, 115, 22)',
               data: [{
                 color: 'rgb(50, 115, 22)',
-                y: 970
+                y: 970,
+                partNum: 123
               }, {
                 color: 'rgb(50, 115, 22)',
                 y: 950
