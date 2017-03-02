@@ -9,7 +9,7 @@
 <dom-module id="dashboards-view">
   <template>
     <style include="dashboards-view-styles"></style>
-
+    <!--Get all engines on Asset-->
     <iron-ajax
       id="engineIronAjax"
       url="/predix-api/predix-asset/engine"
@@ -17,16 +17,19 @@
       auto>
     </iron-ajax>
 
+    <!--Get Engine which has fail sparkplug -->
     <iron-ajax
       id="failEngineRequest"
       on-response="handleFailEngine">
     </iron-ajax>
 
+    <!--Get all engines affected by cutOn property-->
     <iron-ajax
       id="affectedEngineRequest"
       on-response="handleAffectedEngineRequest">
     </iron-ajax>
 
+    <!--Get Sparkplug by Gaziru Id-->
     <iron-ajax
       id="sparkPlugRequest">
     </iron-ajax>
