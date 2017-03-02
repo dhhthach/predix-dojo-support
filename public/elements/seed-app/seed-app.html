@@ -54,51 +54,6 @@
             use-hash-as-path>
           </app-location>
 
-          <!-- /dashboards route and view -->
-          <app-route
-            route="[[_route]]"
-            pattern="/dashboards"
-            active="{{_dashboardsActive}}">
-          </app-route>
-
-          <px-view-custom
-            active="[[_dashboardsActive]]"
-            element-href="/elements/views/dashboards-view.html">
-          </px-view-custom>
-
-          <!-- /engine route and view -->
-          <app-route
-            route="[[_route]]"
-            pattern="/engine"
-            active="{{_engineActive}}">
-          </app-route>
-          <px-view-custom
-            active="[[_engineActive]]"
-            element-href="/elements/views/engine-view.html">
-          </px-view-custom>
-
-          <!-- /spark plug route and view -->
-          <app-route
-                  route="[[_route]]"
-                  pattern="/sparkplug"
-                  active="{{_sparkplugActive}}">
-          </app-route>
-          <px-view-custom
-                  active="[[_sparkplugActive]]"
-                  element-href="/elements/views/sparkplug-view.html">
-          </px-view-custom>
-
-          <!-- /simple-asset route and view -->
-          <app-route
-            route="[[_route]]"
-            pattern="/simple-asset"
-            active="{{_simple-assetActive}}">
-          </app-route>
-          <px-view-custom
-            active="[[_simple-assetActive]]"
-            element-href="/elements/views/simple-asset-view.html">
-          </px-view-custom>
-
           <!-- /assest template route and view -->
           <app-route
                   route="[[_route]]"
@@ -222,7 +177,7 @@
       _checkForDefaultRoute: function() {
         var l = window.location;
         if((l.hash === "#/" || l.hash === "") && l.pathname === "/") {
-          l.hash = "/dashboards";
+          l.hash = "/assettemplate";
         }
       }
 
