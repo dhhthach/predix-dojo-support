@@ -1,6 +1,7 @@
 <link rel="import" href="dashboards-view-styles.html">
 
 <link rel="import" href="../dt-engine-map/dt-engine-map.html">
+<link rel="import" href="../dt-knowledge-map/dt-knowledge-map.html">
 
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
@@ -26,12 +27,15 @@
         </template>
       </ul>
     </div>
-    <template is="dom-if" if="[[!_knowledgeGraphClicked]]">
+
+    <template is="dom-if" if="[[!_knowledgeMapClicked]]">
       <dt-engine-map engines="{{_computedEngines}}" ></dt-engine-map>
     </template>
-    <template is="dom-if" if="[[_knowledgeGraphClicked]]">
-      <iframe frameborder="0" src="https://graphdemo-mm.run.aws-usw02-pr.ice.predix.io/#/"></iframe>
+
+    <template is="dom-if" if="[[_knowledgeMapClicked]]">
+      <dt-knowledge-map engines="{{engines}}"></dt-knowledge-map>      
     </template>
+
   </template>
   <script>
     Polymer({
@@ -47,8 +51,8 @@
               clazz: 'hover'
             },
             {
-              title: 'Knowledge Graph',
-              id: 'simulation'
+              title: 'Knowledge Map',
+              id: 'kmap',
             }
           ]
         },
@@ -65,15 +69,17 @@
           }
         },
 
-        _knowledgeGraphClicked: {
+        _knowledgeMapClicked: {
           type: Boolean,
           value: false
         }
       },
+
       onNavClick: function(e) {
+        console.log(e)
         var _this = this;
         var data = e.target.data;
-        _this._knowledgeGraphClicked = data.id === 'simulation';
+        _this._knowledgeMapClicked = data.id.includes('kmap');
         this[data.action] && this[data.action](data.id);
         this._navItems.forEach(function(e, i) {
           // FIXME: this shit will be removed soon! once polymer fix the issue with array binding
@@ -93,7 +99,29 @@
       },
 
       _updateEngines: function(gaziruId) {
+
         this.$.markedEngineRequest.url = '/predix-api/predix-asset/engine?filter=gaziruId=' + gaziruId + '>parent';
+        this.$.markedEngineRequest.generateRequest().completes.then((function(e) {
+
+          console.log(e)
+
+          e.response[0].flag = true;
+
+          var tempEngines = this.engines.slice();
+
+          this.set('_computedEngines', tempEngines);
+
+          var index = tempEngines.findIndex(function(i) {
+            return i.uri === e.response[0].uri;
+          });
+
+          this.set('_computedEngines.' + index, e.response[0]);
+
+        }).bind(this));
+      },
+
+      _updateSparkplugs: function(gaziruId){
+        this.$.markedEngineRequest.url = '/predix-api/predix-asset/sparkplug?filter=gaziruId=' + gaziruId;
         this.$.markedEngineRequest.generateRequest().completes.then((function(e) {
 
           e.response[0].flag = true;
