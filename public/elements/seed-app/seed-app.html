@@ -17,8 +17,19 @@
 <link rel="import" href="../predix-logo/predix-logo.html">
 <link rel="import" href="../seed-footer/seed-footer.html">
 
+
+<link rel="import" href="../../bower_components/stomp-client/stomp-client.html">
+
+
 <dom-module id="seed-app">
   <template>
+
+    <stomp-client
+            id="websocket"
+            url="/ws/backend/stomp"
+            topic="/topic/data">
+    </stomp-client>
+
 
     <!-- apply imported seed app style module -->
     <style include="seed-app-styles"></style>
@@ -125,7 +136,8 @@
             return {
               version: '1.0',
               name: 'Predix UI Seed',
-              session: {}
+              session: {},
+              gaziruId: '-1'
             }
           }
         },
@@ -200,6 +212,7 @@
       ready: function(){
         window.seedApp = document.getElementById('seedApp');
         this._checkForDefaultRoute();
+        this.$.websocket.connect();
       },
 
       setRoute: function(path, data) {

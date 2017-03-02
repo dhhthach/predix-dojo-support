@@ -16,12 +16,6 @@
             auto>
     </iron-ajax>
 
-    <stomp-client
-            id="websocket"
-            url="/ws/backend/stomp"
-            topic="/topic/timeseries"
-            on-message="_wsMessageReceived">
-    </stomp-client>
 
     <iron-ajax
       id="markedEngineRequest">
@@ -124,19 +118,14 @@
         this.set('_computedEngines', e.detail.response);
       },
 
-      _wsMessageReceived: function() {
-        alert('message received');
-        this._updateEngines(391);
+      _wsMessageReceived: function(e) {
+        console.log('from dashboard');
+        seedApp.global.gaziruId = e.detail;
+        this._updateEngines(Number(e.detail));
       },
 
       refresh: function() {
-        this.$.websocket.close();
-        this.$.websocket.connect();
-      },
-
-      sendMessage: function() {
-        debugger;
-        this.$.websocket.send('abc');
+        document.querySelector('stomp-client').addEventListener('message', this._wsMessageReceived.bind(this));
       }
 
     });

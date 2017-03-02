@@ -57,7 +57,9 @@
       <div class="layout__item u-1/2 borderless">
         <div class="layout" style="padding: 2rem">
           <highcharts-chart type="column" highchart-options="{{chartOptions1}}"></highcharts-chart>
-          <!--<i class="warning-icon fa fa-exclamation-triangle" style="vertical-align: middle;"></i>&nbsp; ID 391 found!-->
+          <template is="dom-if" if="[[isNoticed(gaziruId)]]">
+            <i class="warning-icon fa fa-exclamation-triangle" style="vertical-align: middle;"></i> &nbsp; Sparkplug with ID: {{gaziruId}} is found!
+          </template>
         </div>
       </div>
     </div>
@@ -95,6 +97,13 @@
         oldGaziruIdIndex: {
           type: Number,
           value: -1
+        },
+
+        gaziruId: {
+          type: Number,
+          value: function() {
+            return Number(seedApp.global.gaziruId);
+          }
         },
 
         imageUrl: {
@@ -209,6 +218,9 @@
       },
 
       refresh: function() {
+
+        document.querySelector('stomp-client').addEventListener('message', this._wsMessageReceived.bind(this));
+
         var chart = document.querySelector('highcharts-chart')._chart;
         if (chart && this.oldGaziruIdIndex !== -1) {
           chart.series[0].data[this.oldGaziruIdIndex].update({color: 'rgb(50, 115, 22)'}, true);
@@ -222,7 +234,6 @@
       },
 
       handleSparkPlugResponse: function(e) {
-
         var chart = document.querySelector('highcharts-chart')._chart;
 
         e.detail.response.sort((function(a, b) {
@@ -252,6 +263,27 @@
           chart.series[0].data[index].update({color: 'rgb(50, 50, 122)'}, true);
           this.oldGaziruIdIndex = index;
         }
+      },
+
+      _wsMessageReceived: function(e) {
+        console.log('from sparkplug');
+        this.gaziruId = Number(e.detail);
+        seedApp.global.gaziruId = e.detail;
+        this.updateColorById(Number(e.detail));
+      },
+
+      isNoticed: function(gaziruId) {
+        var index = -1;
+        var chart = document.querySelector('highcharts-chart');
+        if (chart) {
+          chart = document.querySelector('highcharts-chart')._chart;
+          chart.xAxis[0].categories.forEach(function(c, i) {
+            if (c.indexOf(gaziruId+ ' -') !== -1) {
+              index = i;
+            }
+          });
+        }
+        return index !== -1;
       }
 
     });
