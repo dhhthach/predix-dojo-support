@@ -4,6 +4,7 @@
 <link rel="import" href="../dt-knowledge-map/dt-knowledge-map.html">
 
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/stomp-client/stomp-client.html">
 
 <dom-module id="dashboards-view">
   <template>
@@ -15,6 +16,13 @@
             on-response="handleEngineResponse"
             auto>
     </iron-ajax>
+
+    <stomp-client
+            id="websocket"
+            url="/ws/backend/stomp"
+            topic="/topic/timeseries"
+            on-message="_wsMessageReceived">
+    </stomp-client>
 
     <iron-ajax
       id="markedEngineRequest">
@@ -82,7 +90,6 @@
         _this._knowledgeMapClicked = data.id.includes('kmap');
         this[data.action] && this[data.action](data.id);
         this._navItems.forEach(function(e, i) {
-          // FIXME: this shit will be removed soon! once polymer fix the issue with array binding
           _this.set('_navItems.' + i + '.clazz', '');
           if(e.id === data.id) {
             _this.set('_navItems.' + i + '.clazz', 'hover');
@@ -142,6 +149,21 @@
       handleEngineResponse: function(e) {
         this.set('engines', e.detail.response);
         this.set('_computedEngines', e.detail.response);
+      },
+
+      _wsMessageReceived: function() {
+        alert('message received');
+        this._updateEngines(391);
+      },
+
+      refresh: function() {
+        this.$.websocket.close();
+        this.$.websocket.connect();
+      },
+
+      sendMessage: function() {
+        debugger;
+        this.$.websocket.send('abc');
       }
 
     });
