@@ -1,0 +1,304 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/px-card/px-card.html">
+<link rel="import" href="../../bower_components/px-sample-cards/blank-card.html">
+<link rel="import" href="../../bower_components/px-view-header/px-view-header.html">
+<link rel="import" href="../../bower_components/px-dropdown/px-dropdown.html" />
+<link rel="import" href="../../bower_components/px-asset-view/px-asset-view.html" />
+<link rel="import" href="asset-template-view-styles.html">
+<dom-module id="asset-template-view">
+  <template>
+    <style include="asset-template-view-styles">
+
+    </style>
+    <div class="template-container">
+      <div class="header">
+        <div class="title">
+          <h2>Asset Template Viewer</h2>
+        </div>
+      </div>
+      <div class="action-container">
+        <div class="layout layout--center">
+          <div class="layout__item u-1/4">
+            <px-dropdown disabled="{{loading}}" on-px-dropdown-value-changed="_dropdownChanged" display-value="Select Template">
+              <px-dropdown-content class="px-dropdown-content" max-cont-character-width="10" items='{{templates}}'>
+              </px-dropdown-content>
+            </px-dropdown>
+          </div>
+          <div class="layout__item u-1/4">
+            <button class="btn btn-action" on-tap="_uploadTemplate">CSV Upload</button>
+            <input type="file" accept=".json" on-change="_chooseFile" id="upload">
+          </div>
+          <div class="layout__item u-1/4">
+            <button class="btn btn-action" on-tap="_saveTemplate">Save Template</button>
+          </div>
+        </div>
+      </div>
+      <div class="content">
+        <template is="dom-if" if="{{loading}}">
+          <div class="back-drop">
+            <div class="back-drop-message">
+              <i class="fa fa-circle-o-notch fa-spin"></i>
+              <span class="sr-only">Loading...</span>
+            </div>
+          </div>
+        </template>
+        <div class="content-container">
+          <div class="layout layout--center content-row">
+            <div style="text-align: right;" class="layout__item u-1/4">Name</div>
+            <div class="layout__item u-1/2">
+              <input class="text-input" type="text" value="{{currentTemplate.name::input}}" />
+            </div>
+          </div>
+          <div class="layout layout--center content-row">
+            <div style="text-align: right;" class="layout__item u-1/4">Description</div>
+            <div class="layout__item u-1/2">
+              <input class="text-input" type="text" value="{{currentTemplate.description::input}}" />
+            </div>
+          </div>
+          <div class="layout layout--center content-row">
+            <div style="text-align: right;" class="layout__item u-1/4">Read Only</div>
+            <div class="layout__item u-1/2">
+              <input class="checkbox-input" type="checkbox" checked="{{currentTemplate.readOnly::change}}" />
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="layout layout--center">
+            <div class="layout__item u-5/6 asset-view">
+              <px-asset-view data-type="template" raw-data=''></px-asset-view>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </px-view-header>
+  </template>
+  <script>
+    Polymer({
+      is: 'asset-template-view',
+      properties: {
+        loading: {
+          type: Boolean,
+          value: false
+        },
+        templates: {
+          type: Array,
+          value: [{
+              'val': 'Template 1',
+              'key': '0'
+            },
+            {
+              'val': 'Template 2',
+              'key': '1'
+            }
+          ]
+        },
+
+        currentTemplate: {
+          type: Object,
+          value: {
+            name: '',
+            description: '',
+            readOnly: false,
+            value: {}
+          }
+        },
+
+        templateData: {
+          type: Array,
+          value: [{
+              "name": "Template 1",
+              "description": "This is the temp 1",
+              "readOnly": false,
+              "value": {
+                "nodes": [{
+                    "name": "GE",
+                    "attributes": [
+                      "website"
+                    ],
+                    "children": [{
+                      "name": "building",
+                      "attributes": [
+                        "address"
+                      ],
+                      "parent": "GE",
+                      "children": [{
+                        "name": "parking",
+                        "attributes": [
+                          "type"
+                        ],
+                        "parent": "building",
+                        "children": [],
+                        "total": 0,
+                        "id": 4
+                      }],
+                      "total": 1,
+                      "id": 3
+                    }],
+                    "total": 1,
+                    "id": 2
+                  },
+                  {
+                    "name": "building",
+                    "attributes": [
+                      "address"
+                    ],
+                    "parent": "GE",
+                    "children": [{
+                      "name": "parking",
+                      "attributes": [
+                        "type"
+                      ],
+                      "parent": "building",
+                      "children": [],
+                      "total": 0,
+                      "id": 4
+                    }],
+                    "total": 1,
+                    "id": 3
+                  },
+                  {
+                    "name": "parking",
+                    "attributes": [
+                      "type"
+                    ],
+                    "parent": "building",
+                    "children": [],
+                    "total": 0,
+                    "id": 4
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Template 2",
+              "description": "this is template 2",
+              "readOnly": true,
+              "value": {
+                "nodes": [{
+                    "name": "FSoft",
+                    "attributes": [
+                      "root"
+                    ],
+                    "children": [{
+                      "name": "FSU",
+                      "attributes": [
+                        "fsu"
+                      ],
+                      "parent": "FSoft",
+                      "children": [{
+                        "name": "BU",
+                        "attributes": [
+                          "bu"
+                        ],
+                        "parent": "FSU",
+                        "children": [],
+                        "total": 0,
+                        "id": 4
+                      }],
+                      "total": 1,
+                      "id": 3
+                    }],
+                    "total": 1,
+                    "id": 2
+                  },
+                  {
+                    "name": "FSU",
+                    "attributes": [
+                      "fsu"
+                    ],
+                    "parent": "FSoft",
+                    "children": [{
+                      "name": "BU",
+                      "attributes": [
+                        "bu"
+                      ],
+                      "parent": "BU",
+                      "children": [],
+                      "total": 0,
+                      "id": 4
+                    }],
+                    "total": 1,
+                    "id": 3
+                  },
+                  {
+                    "name": "BU",
+                    "attributes": [
+                      "bu"
+                    ],
+                    "parent": "FSU",
+                    "children": [],
+                    "total": 0,
+                    "id": 4
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      ready: function () {
+        console.log('asset-template-view ready()')
+      },
+
+      _dropdownChanged: function (evt) {
+        this._fakeLoading();
+
+        var index = evt.detail.key;
+        this.set('currentTemplate', this.templateData[index]);
+        document.querySelector('px-asset-view').rawData = this.templateData[index].value;
+      },
+
+      _fakeLoading: function () {
+        this.set('loading', true);
+        setTimeout(function () {
+          this.set('loading', false);
+        }.bind(this), 1500);
+      },
+
+      _saveTemplate: function () {
+        var template = document.querySelector('px-asset-view').exportJsonData();
+      },
+
+      _uploadTemplate: function () {
+        this.$.upload.click();
+      },
+
+      _chooseFile: function (evt) {
+        var reader = new FileReader();
+        reader.onload = this._onReaderLoad.bind(this);
+        reader.readAsText(evt.target.files[0]);
+      },
+
+      _onReaderLoad: function (evt) {
+        try {
+          debugger
+          var template = JSON.parse(event.target.result);
+          if (this._isValidateTemplate(template)) {
+            this.set('currentTemplate', template);
+            document.querySelector('px-asset-view').rawData = template.value;
+          } else {
+            alert('Invalid template!');
+          }
+        } catch (e) {
+          alert('Invalid file!');
+        }
+        this.$.upload.value = "";
+      },
+
+      _isValidateTemplate: function (template) {
+        var requiredProps = ['name', 'description', 'readOnly', 'value'],
+          keys = [];
+        for (var prop in template) {
+          if (template[prop].length == 0) return false;
+          keys.push(prop);
+        }
+
+        return requiredProps.every(function (val) {
+          return keys.indexOf(val) >= 0;
+        });
+      }
+    });
+
+  </script>
+</dom-module>
