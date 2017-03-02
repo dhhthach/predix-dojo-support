@@ -57,7 +57,7 @@
       <div class="layout__item u-1/2 borderless">
         <div class="layout" style="padding: 2rem">
           <highcharts-chart type="column" highchart-options="{{chartOptions1}}"></highcharts-chart>
-          <i class="warning-icon fa fa-exclamation-triangle" style="vertical-align: middle;"></i>&nbsp; ID 391 found!
+          <!--<i class="warning-icon fa fa-exclamation-triangle" style="vertical-align: middle;"></i>&nbsp; ID 391 found!-->
         </div>
       </div>
     </div>
@@ -73,6 +73,24 @@
     Polymer({
       is: 'sparkplug-view',
       properties: {
+
+        orderDict: {
+          type: Object,
+          value: {
+            L1: 1,
+            L2: 2,
+            L3: 3,
+            L4: 4,
+            L5: 5,
+            L6: 6,
+            R1: 7,
+            R2: 8,
+            R3: 9,
+            R4: 10,
+            R5: 11,
+            R6: 12
+          }
+        },
 
         oldGaziruIdIndex: {
           type: Number,
@@ -132,7 +150,7 @@
               lineWidth: 1,
               tickWidth: 1,
               title: {
-                text: 'Gaziru Ids'
+                text: 'Gaziru ID - Location'
               },
               labels: {
                 style: {
@@ -191,6 +209,10 @@
       },
 
       refresh: function() {
+        var chart = document.querySelector('highcharts-chart')._chart;
+        if (chart && this.oldGaziruIdIndex !== -1) {
+          chart.series[0].data[this.oldGaziruIdIndex].update({color: 'rgb(50, 115, 22)'}, true);
+        }
         this.$.sparkplugAjaxRequest.url = '/predix-api/predix-asset/sparkplug?filter=parent=/engine/' + window.location.hash.split('/')[2];
         this.$.sparkplugAjaxRequest.generateRequest();
       },
@@ -200,7 +222,12 @@
       },
 
       handleSparkPlugResponse: function(e) {
+
         var chart = document.querySelector('highcharts-chart')._chart;
+
+        e.detail.response.sort((function(a, b) {
+          return this.orderDict[a.location] - this.orderDict[b.location];
+        }).bind(this));
 
         e.detail.response.forEach(function(e, i) {
           e.y = Number(e.deprivedHours);
@@ -208,15 +235,20 @@
         });
 
         chart.xAxis[0].setCategories(e.detail.response.map(function(r) {
-          return r.gaziruId;
+          return r.gaziruId + ' - ' + r.location;
         }), true);
       },
 
       updateColorById: function(id) {
         var chart = document.querySelector('highcharts-chart')._chart;
-        var index = chart.xAxis[0].categories.indexOf('' + id);
+        var index = -1;
+        chart.xAxis[0].categories.forEach(function(c, i) {
+          if (c.indexOf(id+ ' -') !== -1) {
+            index = i;
+          }
+        });
         if (index !== -1) {
-          if (this.oldGaziruIdIndex >= 0) chart.series[0].data[this.oldGaziruIdIndex].update({color: 'rgb(50, 155, 22)'}, true);
+          if (this.oldGaziruIdIndex >= 0) chart.series[0].data[this.oldGaziruIdIndex].update({color: 'rgb(50, 115, 22)'}, true);
           chart.series[0].data[index].update({color: 'rgb(50, 50, 122)'}, true);
           this.oldGaziruIdIndex = index;
         }

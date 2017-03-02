@@ -61,6 +61,16 @@ if (uaaIsConfigured) {
   app.use(passport.session());
 }
 
+var proxies = {
+  proxy: {
+    forward: {
+      '/ws/backend/(.*)': 'https://cf-gaziruid-simulator-cloud.run.aws-usw02-pr.ice.predix.io/' + '$1'
+    }
+  }
+};
+
+app.use(require('json-proxy').initialize(proxies));
+
 //Initializing application modules
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -138,6 +148,8 @@ if (!uaaIsConfigured) { // no restrictions
   });
 
 }
+
+
 
 //logout route
 app.get('/logout', function(req, res) {
