@@ -9,17 +9,29 @@
 <dom-module id="dashboards-view">
   <template>
     <style include="dashboards-view-styles"></style>
-
+    <!--Get all engines on Asset-->
     <iron-ajax
-            id="engineIronAjax"
-            url="/predix-api/predix-asset/engine"
-            on-response="handleEngineResponse"
-            auto>
+      id="engineIronAjax"
+      url="/predix-api/predix-asset/engine"
+      on-response="handleEngineResponse"
+      auto>
     </iron-ajax>
 
-
+    <!--Get Engine which has fail sparkplug -->
     <iron-ajax
-      id="markedEngineRequest">
+      id="failEngineRequest"
+      on-response="handleFailEngine">
+    </iron-ajax>
+
+    <!--Get all engines affected by cutOn property-->
+    <iron-ajax
+      id="affectedEngineRequest"
+      on-response="handleAffectedEngineRequest">
+    </iron-ajax>
+
+    <!--Get Sparkplug by Gaziru Id-->
+    <iron-ajax
+      id="sparkPlugRequest">
     </iron-ajax>
 
     <div id="filterPanel">
@@ -35,7 +47,7 @@
     </template>
 
     <template is="dom-if" if="[[_knowledgeMapClicked]]">
-      <dt-knowledge-map engines="{{engines}}"></dt-knowledge-map>      
+      <dt-knowledge-map engines="{{affectedEngines}}"></dt-knowledge-map>
     </template>
 
   </template>
@@ -59,6 +71,12 @@
           ]
         },
         engines: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+        affectedEngines: {
           type: Array,
           value: function() {
             return [];
@@ -100,29 +118,10 @@
 
       _updateEngines: function(gaziruId) {
 
-        this.$.markedEngineRequest.url = '/predix-api/predix-asset/engine?filter=gaziruId=' + gaziruId + '>parent';
-        this.$.markedEngineRequest.generateRequest().completes.then((function(e) {
+        this.$.failEngineRequest.url = '/predix-api/predix-asset/engine?filter=gaziruId=' + gaziruId + '>parent';
+        this.$.failEngineRequest.generateRequest().completes.then((function(e) {
 
           console.log(e)
-
-          e.response[0].flag = true;
-
-          var tempEngines = this.engines.slice();
-
-          this.set('_computedEngines', tempEngines);
-
-          var index = tempEngines.findIndex(function(i) {
-            return i.uri === e.response[0].uri;
-          });
-
-          this.set('_computedEngines.' + index, e.response[0]);
-
-        }).bind(this));
-      },
-
-      _updateSparkplugs: function(gaziruId){
-        this.$.markedEngineRequest.url = '/predix-api/predix-asset/sparkplug?filter=gaziruId=' + gaziruId;
-        this.$.markedEngineRequest.generateRequest().completes.then((function(e) {
 
           e.response[0].flag = true;
 
@@ -144,14 +143,38 @@
         this.set('_computedEngines', e.detail.response);
       },
 
+      handleFailEngine: function(e) {
+        e.detail.response[0].flag = true;
+        var tempEngines = this.engines.slice();
+        this.set('_computedEngines', tempEngines);
+        var index = tempEngines.findIndex(function(i) {
+          return i.uri === e.detail.response[0].uri;
+        });
+        this.set('_computedEngines.' + index, e.detail.response[0]);
+      },
+
       _wsMessageReceived: function(e) {
         console.log('from dashboard');
         seedApp.global.gaziruId = e.detail;
         this._updateEngines(Number(e.detail));
+        this.findAffectedEngine(Number(e.detail));
       },
 
       refresh: function() {
         document.querySelector('stomp-client').addEventListener('message', this._wsMessageReceived.bind(this));
+      },
+
+      findAffectedEngine: function(id) {
+        this.$.sparkPlugRequest.url = '/predix-api/predix-asset/sparkplug?filter=gaziruId=' + id;
+        this.$.sparkPlugRequest.generateRequest().completes.then((function(e) {
+          console.log(e.response[0].manufacture.cutOn);
+          this.$.affectedEngineRequest.url = '/predix-api/predix-asset/engine?filter=manufacture.cutOn=' + e.response[0].manufacture.cutOn + '>parent';
+          this.$.affectedEngineRequest.generateRequest();
+        }).bind(this));
+      },
+
+      handleAffectedEngineRequest: function(e) {
+        this.set('affectedEngines', e.detail.response);
       }
 
     });
