@@ -15,23 +15,10 @@
       }
 
     </style>
-
-    <iron-ajax
-            id="getTemplateAjax"
-            url="{{getTemplateEndpoint}}"
-            loading="{{loading}}"
-            handle-as="json"
-            on-response="_handleTemplates">
+    <iron-ajax id="getTemplateAjax" url="{{getTemplateEndpoint}}" loading="{{loading}}" handle-as="json" on-response="_handleTemplates">
     </iron-ajax>
-    <iron-ajax
-            id="saveTemplateAjax"
-            url="{{saveTemplateEndpoint}}"
-            method="POST"
-            loading="{{loading}}"
-            handle-as="json"
-            on-response="_handleSaveTemplate">
+    <iron-ajax id="saveTemplateAjax" url="{{saveTemplateEndpoint}}" method="POST" loading="{{loading}}" handle-as="json" on-response="_handleSaveTemplate">
     </iron-ajax>
-
     <div class="template-container">
       <div class="header">
         <div class="title">
@@ -68,13 +55,13 @@
           <div class="layout layout--center content-row">
             <div style="text-align: right;" class="layout__item u-1/4">Name</div>
             <div class="layout__item u-1/2">
-              <input class="text-input" type="text" value="{{currentTemplate.name::input}}" />
+              <input class="text-input" id="name" type="text" value="{{currentTemplate.name::input}}" />
             </div>
           </div>
           <div class="layout layout--center content-row">
             <div style="text-align: right;" class="layout__item u-1/4">Description</div>
             <div class="layout__item u-1/2">
-              <input class="text-input" type="text" value="{{currentTemplate.description::input}}" />
+              <input class="text-input" id="description" type="text" value="{{currentTemplate.description::input}}" />
             </div>
           </div>
           <div class="layout layout--center content-row">
@@ -147,9 +134,10 @@
         var nodes = document.querySelector('px-asset-view').exportJsonData();
         var template = this.get('currentTemplate');
         template["nodes"] = nodes.nodes;
-
-        this.$.saveTemplateAjax.body = template;
-        this.$.saveTemplateAjax.generateRequest();
+        if (this._validate()) {
+          this.$.saveTemplateAjax.body = template;
+          this.$.saveTemplateAjax.generateRequest();
+        }
       },
 
       _uploadTemplate: function () {
@@ -191,10 +179,36 @@
         });
       },
 
-      _handleTemplates: function(res){
+      _handleTemplates: function (res) {
         var templates = res.detail.response;
         this.set('templateData', templates);
-        this.set('templates', templates.map((v,i) => ({val: v.name, key: i}) ));
+        this.set('templates', templates.map((v, i) => ({
+          val: v.name,
+          key: i
+        })));
+      },
+
+      _validate: function () {
+        var isValid = true;
+        if (this.$.name.value.trim().length == 0) {
+          isValid = false;
+          this._toggleAlert('name');
+        }
+        if (this.$.description.value.trim().length == 0) {
+          isValid = false;
+          this._toggleAlert('description');
+        }
+        return isValid;
+      },
+
+      _toggleAlert: function (name) {
+        this.$$('#' + name).style.borderColor = '#e53838';
+        this.$$('#' + name).style.boxShadow = '0 0 10px #e53838';
+
+        setTimeout(function () {
+          this.$$('#' + name).style.borderColor = '';
+          this.$$('#' + name).style.boxShadow = '';
+        }.bind(this), 1000);
       }
     });
 
