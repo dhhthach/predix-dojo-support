@@ -64,7 +64,7 @@ if (uaaIsConfigured) {
 var proxies = {
   proxy: {
     forward: {
-      '/ws/backend/(.*)': 'https://cf-gaziruid-simulator-cloud.run.aws-usw02-pr.ice.predix.io/' + '$1'
+      '/ws/backend/(.*)': 'https://pae-nec-cloud-dt-api.run.aws-usw02-pr.ice.predix.io/' + '$1'
     }
   }
 };

@@ -167,7 +167,7 @@
       findAffectedEngine: function(id) {
         this.$.sparkPlugRequest.url = '/predix-api/predix-asset/sparkplug?filter=gaziruId=' + id;
         this.$.sparkPlugRequest.generateRequest().completes.then((function(e) {
-          console.log(e.response[0].manufacture.cutOn);
+          seedApp.global.cutOn = e.response[0].manufacture.cutOn;
           this.$.affectedEngineRequest.url = '/predix-api/predix-asset/engine?filter=manufacture.cutOn=' + e.response[0].manufacture.cutOn + '>parent';
           this.$.affectedEngineRequest.generateRequest();
         }).bind(this));
