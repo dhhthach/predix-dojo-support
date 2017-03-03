@@ -38,17 +38,13 @@
                     data="{{item}}" 
                     click-events="true" 
                     mouse-events="true"
-                    on-google-map-marker-dblclick="onEngineClick" 
+                    on-google-map-marker-click="onEngineClick"
                     on-google-map-marker-mouseover="onEngineHover"
                     on-google-map-marker-mouseout="onEngineOut"
                     icon={{getIcon(item)}} 
                     latitude="{{item.location.lat}}" 
                     longitude="{{item.location.lng}}"
                     title={{item.description}}>
-                        <div id="i{{item.id}}">
-                            <div><strong>Manufacturer: </strong>{{item.manufactuer}}</div>
-                            <div><strong>Model No: </strong>{{item.modelNumber}}</div>
-                        </div>
                 </google-map-marker>
             </template>
 
