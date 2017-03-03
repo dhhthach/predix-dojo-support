@@ -1,32 +1,28 @@
 <link rel="import" href="../../bower_components/google-map/google-map.html">
 <link rel="import" href="../satellite-legends/satellite-legends.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
 <link rel="import" href="">
 
 <dom-module id="dt-knowledge-map">
     <template>
+        <iron-ajax id="sparkplugRequest"></iron-ajax>
         <style>
             #infoWindow{
                 position: absolute;
                 z-index: 2;
-                max-width: 150px;
-                max-height: 100px;
                 background: white;
-                width: 150px;
-                height: 100px;
-                border-radius: 1em;
-                font-size: 9px;
+                display: none;
+                right: 0;
+                width: 230px;
+                top: 9.1em;
+                bottom: 0;
                 padding: 10px;
                 text-align: center;
-                display: none;
-                left: 35%;
-                box-shadow: 0px 15px 15px -12px rgba(0,0,0,0.75);
-                top: 5em;
             }
         </style>
 
         <div id="infoWindow">
-            <p>{{infoContent}}</p>
         </div>
 
         <google-map id="gmap" mapTypeId="hybrid" zoom=2 latitude="20" longitude="5" style="width: calc(100% - 250px)">
@@ -87,9 +83,20 @@
                 seedApp.setRoute(e.target.data.uri.substring(1));
             },
             onEngineHover: function(e){
-                document.getElementById("infoWindow").style.display="block"
-                this.infoContent = "Manufacturer: "+e.model.get('item.manufactuer')
-                this.infoContent += "\nModel No: "+e.model.get('item.modelNumber')
+                this.$.infoWindow.innerHTML = 'Getting sparkplugs of ' + seedApp.global.cutOn;
+                document.getElementById("infoWindow").style.display = "block";
+
+                this.$.sparkplugRequest.url = '/predix-api/predix-asset/sparkplug?filter=parent=' + e.model.item.uri
+                + ':manufacture.cutOn=' + seedApp.global.cutOn;
+                this.$.sparkplugRequest.generateRequest().completes.then((function(e) {
+                  var result = '';
+                  e.response.forEach(function(s) {
+                    result += 'Gaziru ID: ' + '<b>' + s.gaziruId + '</b> - Location: ' + '<b>' + s.location + '</b><br>';
+                  });
+
+                  this.$.infoWindow.innerHTML = result;
+                }).bind(this));
+
             },
             onEngineOut: function(e){
                 document.getElementById("infoWindow").style.display="none"
@@ -105,12 +112,7 @@
                 //     icon = 'green';
                 // }
 
-                if(item.manufactuer==="Cummins")
-                    icon = 'red';
-                else
-                    icon = 'green';
-
-                icon = icon + '-square-pin.png';
+                icon = 'red-square-pin.png';
 
                 url = '/images/map-pins/'+icon;
 

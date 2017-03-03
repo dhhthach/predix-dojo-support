@@ -127,7 +127,7 @@
                 return '<b>Rod Type: </b>' + this.point.manufacture.rodType + '<br/>'
                   + '<b>Type: </b>' + this.point.manufacture.type + '<br/>'
                   + '<b>Supplier: </b>' + this.point.manufacture.supplier + '<br/>'
-                  + '<b>Cut On: </b>' + this.point.manufacture.cutOn + '<br>'
+                  + '<b>Milling Machine: </b>' + this.point.manufacture.cutOn + '<br>'
                   + '<b>Install Date: </b>' + this.point.manufacture.installDate + '<br/>'
                   + '<b>Operator: </b>' + this.point.manufacture.operator + '<br/>';
               }
@@ -159,7 +159,7 @@
               lineWidth: 1,
               tickWidth: 1,
               title: {
-                text: 'Gaziru ID - Location'
+                text: 'Gaziru ID - Bracket position'
               },
               labels: {
                 style: {
@@ -248,6 +248,10 @@
         chart.xAxis[0].setCategories(e.detail.response.map(function(r) {
           return r.gaziruId + ' - ' + r.location;
         }), true);
+
+        if (this.isNoticed(seedApp.global.gaziruId)) {
+          this.updateColorById(seedApp.global.gaziruId);
+        }
       },
 
       updateColorById: function(id) {
