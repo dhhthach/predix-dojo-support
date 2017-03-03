@@ -29,20 +29,31 @@
             <p>{{infoContent}}</p>
         </div>
 
-        <google-map id="gmap" mapTypeId="hybrid" zoom=2 latitude="20" longitude="5" style="width: calc(100% - 250px)">
+        <google-map 
+            id="gmap" 
+            mapTypeId="hybrid" 
+            zoom=2 
+            latitude="20" 
+            longitude="5" 
+            disable-double-click-zoom: true
+            style="width: calc(100% - 250px)">
             
             <template is="dom-repeat" items="{{engines}}"> <!--{{getIcon(item.type)}}-->
                 <google-map-marker 
                     data="{{item}}" 
                     click-events="true" 
                     mouse-events="true"
-                    on-google-map-marker-click="onEngineClick" 
+                    on-google-map-marker-dblclick="onEngineClick" 
                     on-google-map-marker-mouseover="onEngineHover"
                     on-google-map-marker-mouseout="onEngineOut"
                     icon={{getIcon(item)}} 
                     latitude="{{item.location.lat}}" 
                     longitude="{{item.location.lng}}"
                     title={{item.description}}>
+                        <div id="i{{item.id}}">
+                            <div><strong>Manufacturer: </strong>{{item.manufactuer}}</div>
+                            <div><strong>Model No: </strong>{{item.modelNumber}}</div>
+                        </div>
                 </google-map-marker>
             </template>
 
@@ -70,6 +81,9 @@
                 infoContent:{
                     type: String,
                     value: ""
+                },
+                infowindow:{
+
                 }
             },
 
@@ -85,25 +99,31 @@
             },
             onEngineClick: function(e) {
                 seedApp.setRoute(e.target.data.uri.substring(1));
+
             },
             onEngineHover: function(e){
-                document.getElementById("infoWindow").style.display="block"
-                this.infoContent = "Manufacturer: "+e.model.get('item.manufactuer')
-                this.infoContent += "\nModel No: "+e.model.get('item.modelNumber')
+
+                // infoContent="Manufacturer: "+e.model.get('item.manufactuer')+"\n"+
+                //             "Model No: "+e.model.get('item.modelNumber')
+
+                // console.log(infoContent)
+
+                // infowindow = new google.maps.InfoWindow({
+                //   content: infoContent,
+                //   position: new google.maps.LatLng(e.model.get('item.location.lat'),e.model.get('item.location.lng'))
+                // });
+
+                // infowindow.open(map, e.target);
             },
+
             onEngineOut: function(e){
-                document.getElementById("infoWindow").style.display="none"
+                // console.log(e)
+                // infowindow.close()              
             },
             getIcon: function(item) {
                 var url;
 
                 var icon = null;
-
-                // if (item.flag) {
-                //     icon = 'red';
-                // } else {
-                //     icon = 'green';
-                // }
 
                 if(item.manufactuer==="Cummins")
                     icon = 'red';
