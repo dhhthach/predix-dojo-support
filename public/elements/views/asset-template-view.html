@@ -4,19 +4,38 @@
 <link rel="import" href="../../bower_components/px-view-header/px-view-header.html">
 <link rel="import" href="../../bower_components/px-dropdown/px-dropdown.html" />
 <link rel="import" href="../../bower_components/px-asset-view/px-asset-view.html" />
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="asset-template-view-styles.html">
 <dom-module id="asset-template-view">
   <template>
     <style include="asset-template-view-styles">
       px-dropdown ::shadow #textWrap,
       px-dropdown ::shadow #trigger {
-        color: #b6c3cc;
+        color: var(--asset-template-button-text-color, #b6c3cc);
       }
+
     </style>
+
+    <iron-ajax
+            id="getTemplateAjax"
+            url="{{getTemplateEndpoint}}"
+            loading="{{loading}}"
+            handle-as="json"
+            on-response="_handleTemplates">
+    </iron-ajax>
+    <iron-ajax
+            id="saveTemplateAjax"
+            url="{{saveTemplateEndpoint}}"
+            method="POST"
+            loading="{{loading}}"
+            handle-as="json"
+            on-response="_handleSaveTemplate">
+    </iron-ajax>
+
     <div class="template-container">
       <div class="header">
         <div class="title">
-          <h2>Asset Template Viewer</h2>
+          <h2>{{headerTitle}}</h2>
         </div>
       </div>
       <div class="action-container">
@@ -80,21 +99,21 @@
     Polymer({
       is: 'asset-template-view',
       properties: {
+        headerTitle: {
+          type: String
+        },
+        getTemplateEndpoint: {
+          type: String
+        },
+        saveTemplateEndpoint: {
+          type: String
+        },
         loading: {
           type: Boolean,
           value: false
         },
         templates: {
-          type: Array,
-          value: [{
-              'val': 'Template 1',
-              'key': '0'
-            },
-            {
-              'val': 'Template 2',
-              'key': '1'
-            }
-          ]
+          type: Array
         },
 
         currentTemplate: {
@@ -102,165 +121,35 @@
           value: {
             name: '',
             description: '',
-            readOnly: false,
-            value: {}
+            readOnly: false
           }
         },
 
         templateData: {
-          type: Array,
-          value: [{
-              "name": "Template 1",
-              "description": "This is the temp 1",
-              "readOnly": false,
-              "value": {
-                "nodes": [{
-                    "name": "GE",
-                    "attributes": [
-                      "website"
-                    ],
-                    "children": [{
-                      "name": "building",
-                      "attributes": [
-                        "address"
-                      ],
-                      "parent": "GE",
-                      "children": [{
-                        "name": "parking",
-                        "attributes": [
-                          "type"
-                        ],
-                        "parent": "building",
-                        "children": [],
-                        "total": 0,
-                        "id": 4
-                      }],
-                      "total": 1,
-                      "id": 3
-                    }],
-                    "total": 1,
-                    "id": 2
-                  },
-                  {
-                    "name": "building",
-                    "attributes": [
-                      "address"
-                    ],
-                    "parent": "GE",
-                    "children": [{
-                      "name": "parking",
-                      "attributes": [
-                        "type"
-                      ],
-                      "parent": "building",
-                      "children": [],
-                      "total": 0,
-                      "id": 4
-                    }],
-                    "total": 1,
-                    "id": 3
-                  },
-                  {
-                    "name": "parking",
-                    "attributes": [
-                      "type"
-                    ],
-                    "parent": "building",
-                    "children": [],
-                    "total": 0,
-                    "id": 4
-                  }
-                ]
-              }
-            },
-            {
-              "name": "Template 2",
-              "description": "this is template 2",
-              "readOnly": true,
-              "value": {
-                "nodes": [{
-                    "name": "FSoft",
-                    "attributes": [
-                      "root"
-                    ],
-                    "children": [{
-                      "name": "FSU",
-                      "attributes": [
-                        "fsu"
-                      ],
-                      "parent": "FSoft",
-                      "children": [{
-                        "name": "BU",
-                        "attributes": [
-                          "bu"
-                        ],
-                        "parent": "FSU",
-                        "children": [],
-                        "total": 0,
-                        "id": 4
-                      }],
-                      "total": 1,
-                      "id": 3
-                    }],
-                    "total": 1,
-                    "id": 2
-                  },
-                  {
-                    "name": "FSU",
-                    "attributes": [
-                      "fsu"
-                    ],
-                    "parent": "FSoft",
-                    "children": [{
-                      "name": "BU",
-                      "attributes": [
-                        "bu"
-                      ],
-                      "parent": "BU",
-                      "children": [],
-                      "total": 0,
-                      "id": 4
-                    }],
-                    "total": 1,
-                    "id": 3
-                  },
-                  {
-                    "name": "BU",
-                    "attributes": [
-                      "bu"
-                    ],
-                    "parent": "FSU",
-                    "children": [],
-                    "total": 0,
-                    "id": 4
-                  }
-                ]
-              }
-            }
-          ]
+          type: Array
         }
       },
       ready: function () {
-        console.log('asset-template-view ready()')
+        this.refresh();
+      },
+
+      refresh: function () {
+        this.$.getTemplateAjax.generateRequest();
       },
 
       _dropdownChanged: function (evt) {
-        this._fakeLoading();
-
         var index = evt.detail.key;
         this.set('currentTemplate', this.templateData[index]);
-        document.querySelector('px-asset-view').rawData = this.templateData[index].value;
-      },
-
-      _fakeLoading: function () {
-        this.set('loading', true);
-        setTimeout(function () {
-          this.set('loading', false);
-        }.bind(this), 1500);
+        document.querySelector('px-asset-view').rawData = this.templateData[index];
       },
 
       _saveTemplate: function () {
-        var template = document.querySelector('px-asset-view').exportJsonData();
+        var nodes = document.querySelector('px-asset-view').exportJsonData();
+        var template = this.get('currentTemplate');
+        template["nodes"] = nodes.nodes;
+
+        this.$.saveTemplateAjax.body = template;
+        this.$.saveTemplateAjax.generateRequest();
       },
 
       _uploadTemplate: function () {
@@ -279,7 +168,7 @@
           var template = JSON.parse(event.target.result);
           if (this._isValidateTemplate(template)) {
             this.set('currentTemplate', template);
-            document.querySelector('px-asset-view').rawData = template.value;
+            document.querySelector('px-asset-view').rawData = template;
           } else {
             alert('Invalid template!');
           }
@@ -290,7 +179,7 @@
       },
 
       _isValidateTemplate: function (template) {
-        var requiredProps = ['name', 'description', 'readOnly', 'value'],
+        var requiredProps = ['name', 'description', 'readOnly'],
           keys = [];
         for (var prop in template) {
           if (template[prop].length == 0) return false;
@@ -300,6 +189,12 @@
         return requiredProps.every(function (val) {
           return keys.indexOf(val) >= 0;
         });
+      },
+
+      _handleTemplates: function(res){
+        var templates = res.detail.response;
+        this.set('templateData', templates);
+        this.set('templates', templates.map((v,i) => ({val: v.name, key: i}) ));
       }
     });
 

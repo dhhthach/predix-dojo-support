@@ -49,15 +49,15 @@ $inuit-enable-btn--bare: true;
 @import "px-spacing-design/_trumps.spacing.scss";
 
  :host {
-  --px-dropdown-bg-color: transparent;
-  --px-dropdown-border-color: #59717f;
+  --px-dropdown-bg-color: var(--asset-template-button-bg-color, transparent);
+  --px-dropdown-border-color: var(--asset-template-button-border-color, #59717f);
   --px-dropdown-content-text-color: black;
-  --px-dropdown-bg-color--hover: transparent;
-  --px-dropdown-bg-color--opened: transparent;
+  --px-dropdown-bg-color--hover: var(--asset-template-button-bg-color, transparent);
+  --px-dropdown-bg-color--opened: var(--asset-template-button-bg-color, transparent);
   --px-dropdown-content-background-color: whitesmoke;
   --px-dropdown-content-border-color: whitesmoke;
-  --px-dropdown-bg-color--disabled: transparent;
-  --px-dropdown-border-color--disabled: #59717f;
+  --px-dropdown-bg-color--disabled: var(--asset-template-button-bg-color, transparent);
+  --px-dropdown-border-color--disabled: var(--asset-template-button-border-color, #59717f);
 }
 
 .px-dropdown-chevron-0 {
@@ -65,33 +65,34 @@ $inuit-enable-btn--bare: true;
 }
 
 .template-container {
-  border: 1px solid #59717f;
+  border: 1px solid var(--asset-template-border-color, #59717f);
   margin: 20px;
   min-height: 200px;
+  background-color: var(--asset-template-bg-color, #2c404c);
 }
 
 .template-container .header,
 .template-container .action-container {
   padding: 10px 20px;
-  border-bottom: 1px solid #59717f;
+  border-bottom: 1px solid var(--asset-template-border-color, #59717f);
 }
 
 .content-container {
   padding: 30px;
-  color: #b6c3cc;
+  color: var(--asset-template-text-color, #b6c3cc);
 }
 
 .title {
-  color: #b6c3cc;
+  color: var(--asset-template-text-color, #b6c3cc);
 }
 
 .text-input {
   height: 30px;
-  background-color: transparent;
-  border: 1px solid #59717f;
+  background-color: var(--asset-template-input-bg-color, transparent);
+  border: 1px solid var(--asset-template-input-border-color, #59717f);
   padding-left: 10px;
   padding-right: 10px;
-  color: white;
+  color: var(--asset-template-text-color, #b6c3cc);
   width: 300px;
 }
 
@@ -108,7 +109,7 @@ $inuit-enable-btn--bare: true;
 }
 
 .asset-view {
-  border: 1px solid #59717f;
+  border: 1px solid var(--asset-template-border-color, #59717f);
   margin-bottom: 30px;
   overflow: auto;
 }
@@ -116,10 +117,11 @@ $inuit-enable-btn--bare: true;
 .btn-action,
 .btn-action:hover,
 .btn-action:focus {
-  background-color: transparent;
-  color: #b6c3cc;
+  background-color: var(--asset-template-button-bg-color, transparent);
+  color: var(--asset-template-button-text-color, #b6c3cc);
   width: 100%;
-  border: 1px solid #59717f;
+  // border-color:  ;
+  border: 1px solid var(--asset-template-button-border-color, #59717f);
   outline: 0;
   box-shadow: 0;
 }
@@ -133,7 +135,7 @@ $inuit-enable-btn--bare: true;
   z-index: 9999;
   width: 100%;
   height: 100%;
-  background-color: #2c404c;
+  background-color: var(--asset-template-bg-color, #2c404c);
 }
 
 .back-drop-message {
@@ -145,7 +147,7 @@ $inuit-enable-btn--bare: true;
   left: 0;
   right: 0;
   margin: auto;
-  color: #b6c3cc;
+  color: var(--asset-template-text-color, #b6c3cc);
 }
 
 #upload {

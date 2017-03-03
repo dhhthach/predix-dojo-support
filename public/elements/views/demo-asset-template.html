@@ -1,0 +1,29 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="./asset-template-view.html">
+<dom-module id="demo-asset-template">
+  <template>
+      <style>
+        :host {
+            /*--asset-template-button-bg-color: whitesmoke;
+            --asset-template-button-border-color: red;
+            --asset-template-button-text-color: blue;
+            --asset-template-bg-color: gray;
+            --asset-template-border-color: green;
+            --asset-template-text-color: teal;
+            --asset-template-input-bg-color: black;
+            --asset-template-input-border-color: yellow;*/
+        }
+      </style>
+    <asset-template-view header-title="Asset Template Viewer"
+    get-template-endpoint="/templates" save-template-endpoint="/save">
+        
+    </asset-template-view>
+  </template>
+  <script>
+    Polymer({
+      is: 'demo-asset-template',
+      properties: {},
+    });
+
+  </script>
+</dom-module>
