@@ -112,6 +112,8 @@ $inuit-enable-btn--bare: true;
   border: 1px solid var(--asset-template-border-color, #59717f);
   margin-bottom: 30px;
   overflow: auto;
+  max-height: var(--px-asset-view-max-height, 500px);
+  padding-bottom: 150px;
 }
 
 .btn-action,
@@ -120,11 +122,19 @@ $inuit-enable-btn--bare: true;
   background-color: var(--asset-template-button-bg-color, transparent);
   color: var(--asset-template-button-text-color, #b6c3cc);
   width: 100%;
-  // border-color:  ;
   border: 1px solid var(--asset-template-button-border-color, #59717f);
   outline: 0;
   box-shadow: 0;
 }
+
+.btn-action-popup {
+  color: var(--asset-template-button-popup-text-color, black);
+  background-color: var(--asset-template-button-bg-color, transparent);
+  width: 100%;
+  border: 1px solid var(--asset-template-button-border-color, #59717f);
+  outline: 0;
+  box-shadow: 0;
+},
 
 .content {
   position: relative;
@@ -152,4 +162,8 @@ $inuit-enable-btn--bare: true;
 
 #upload {
   display: none;
+}
+
+#file-upload-container {
+  padding: 0.5em;
 }

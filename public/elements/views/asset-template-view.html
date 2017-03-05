@@ -5,6 +5,9 @@
 <link rel="import" href="../../bower_components/px-dropdown/px-dropdown.html" />
 <link rel="import" href="../../bower_components/px-asset-view/px-asset-view.html" />
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/px-file-upload/px-file-upload.html"/>
+<link rel="import" href="../../bower_components/px-popover/px-popover.html"/>
+
 <link rel="import" href="asset-template-view-styles.html">
 <dom-module id="asset-template-view">
   <template>
@@ -14,10 +17,16 @@
         color: var(--asset-template-button-text-color, #b6c3cc);
       }
 
+      px-popover {
+        --px-popover-max-width: auto;
+      }
+
     </style>
     <iron-ajax id="getTemplateAjax" url="{{getTemplateEndpoint}}" loading="{{loading}}" handle-as="json" on-response="_handleTemplates">
     </iron-ajax>
     <iron-ajax id="saveTemplateAjax" url="{{saveTemplateEndpoint}}" method="POST" loading="{{loading}}" handle-as="json" on-response="_handleSaveTemplate">
+    </iron-ajax>
+    <iron-ajax id="createAssetAjax" url="{{createAssetEndpoint}}" method="POST" loading="{{loading}}" debounce-duration="300">
     </iron-ajax>
     <div class="template-container">
       <div class="header">
@@ -34,11 +43,38 @@
             </px-dropdown>
           </div>
           <div class="layout__item u-1/4">
-            <button class="btn btn-action" on-tap="_uploadTemplate">CSV Upload</button>
-            <input type="file" accept=".json" on-change="_chooseFile" id="upload">
+            <div style="position: relative;">
+              <button class="btn btn-action" id='create-btn' type='button' name='button'>Create Asset</button>
+              <px-popover id="fileUploadPopover" enhanced="true"
+                          orientation="bottom"
+                          position="relative"
+                          for="create-btn"
+                          enhanced="true">
+                <div class="popover-content">
+                  <div id="file-upload-container">
+                    <px-file-upload id="dataFile" message="Upload CSV data"  accept=".csv"></px-file-upload>
+                    <px-file-upload id="templateFile" message="Upload JSON template"  accept=".json"></px-file-upload>
+                  </div>
+                  <button style="margin-top: 1em" class="btn btn-action-popup" on-tap="_createAsset">Submit</button>
+                </div>
+              </px-popover>
+            </div>
           </div>
           <div class="layout__item u-1/4">
-            <button class="btn btn-action" on-tap="_saveTemplate">Save Template</button>
+            <div style="position: relative;">
+              <button class="btn btn-action" id="save-btn">Save Template</button>
+              <px-popover enhanced="true"
+                          orientation="bottom"
+                          position="relative"
+                          for="save-btn"
+                          enhanced="true">
+                <div>
+                  <button class="btn btn-action-popup" action="create" on-tap="_saveTemplate">Create Template</button>
+                  <br/>
+                  <button style="margin-top: 1em" class="btn btn-action-popup" action="edit" on-tap="_saveTemplate">Edit Template</button>
+                </div>
+              </px-popover>
+            </div>
           </div>
         </div>
       </div>
@@ -95,6 +131,9 @@
         saveTemplateEndpoint: {
           type: String
         },
+        createAssetEndpoint: {
+          type: String
+        },
         loading: {
           type: Boolean,
           value: false
@@ -126,44 +165,22 @@
 
       _dropdownChanged: function (evt) {
         var index = evt.detail.key;
-        this.set('currentTemplate', this.templateData[index]);
+        this.set('currentTemplate', JSON.parse(JSON.stringify(this.templateData[index])));
         document.querySelector('px-asset-view').rawData = this.templateData[index];
       },
 
-      _saveTemplate: function () {
+      _saveTemplate: function (e) {
         var nodes = document.querySelector('px-asset-view').exportJsonData();
         var template = this.get('currentTemplate');
         template["nodes"] = nodes.nodes;
         if (this._validate()) {
+          if (e.target.getAttribute('action') === 'create') delete template.id;
+          console.log(JSON.stringify(template, null, '    '));
           this.$.saveTemplateAjax.body = template;
-          this.$.saveTemplateAjax.generateRequest();
+          this.$.saveTemplateAjax.generateRequest().completes.then((function(e) {
+            this.refresh();
+          }).bind(this));
         }
-      },
-
-      _uploadTemplate: function () {
-        this.$.upload.click();
-      },
-
-      _chooseFile: function (evt) {
-        var reader = new FileReader();
-        reader.onload = this._onReaderLoad.bind(this);
-        reader.readAsText(evt.target.files[0]);
-      },
-
-      _onReaderLoad: function (evt) {
-        try {
-          debugger
-          var template = JSON.parse(event.target.result);
-          if (this._isValidateTemplate(template)) {
-            this.set('currentTemplate', template);
-            document.querySelector('px-asset-view').rawData = template;
-          } else {
-            alert('Invalid template!');
-          }
-        } catch (e) {
-          alert('Invalid file!');
-        }
-        this.$.upload.value = "";
       },
 
       _isValidateTemplate: function (template) {
@@ -205,11 +222,40 @@
         this.$$('#' + name).style.borderColor = '#e53838';
         this.$$('#' + name).style.boxShadow = '0 0 10px #e53838';
 
-        setTimeout(function () {
+        this.async(function () {
           this.$$('#' + name).style.borderColor = '';
           this.$$('#' + name).style.boxShadow = '';
         }.bind(this), 1000);
+      },
+
+      _createAsset: function() {
+
+        var dataFile = this.$.dataFile.files;
+        var templateFile = this.$.templateFile.files;
+
+        if (dataFile.length === 0 || templateFile.length === 0) {
+
+          this.$$('#file-upload-container').style.borderColor = '#e53838';
+          this.$$('#file-upload-container').style.boxShadow = '0 0 10px #e53838';
+
+          this.async(function () {
+            this.$$('#file-upload-container').style.borderColor = '';
+            this.$$('#file-upload-container').style.boxShadow = '';
+          }.bind(this), 1000);
+
+          return;
+
+        }
+
+        var formData = new FormData();
+        formData.append('template', templateFile[0]);
+        formData.append('assetdata', dataFile[0]);
+        this.$.createAssetAjax.body = formData;
+        this.$.createAssetAjax.generateRequest();
+        this.$.fileUploadPopover.hide();
+
       }
+
     });
 
   </script>

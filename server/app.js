@@ -162,6 +162,7 @@ app.get('/favicon.ico', function (req, res) {
 app.get('/templates', function (req, res) {
   res.send(
     [{
+        "id": 1,
         "name": "Template 1",
         "description": "This is the temp 1",
         "readOnly": false,
@@ -188,6 +189,7 @@ app.get('/templates', function (req, res) {
         ]
       },
       {
+        "id": 2,
         "name": "Template 2",
         "description": "this is template 2",
         "readOnly": true,

@@ -43,7 +43,9 @@
     "highcharts-chart": "^1.1.5",
     "px-progress-bar": "^0.1.3",
     "px-box-design": "^0.4.4",
-    "px-asset-view": "https://github.com/kira411/px-asset-view.git"
+    "px-asset-view": "https://github.com/kira411/px-asset-view.git",
+    "px-file-upload": "^0.4.7",
+    "px-popover": "^1.7.6"
   },
   "devDependencies": {
     "px-forms-design": "^1.1.1",
