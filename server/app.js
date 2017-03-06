@@ -62,6 +62,16 @@ if (uaaIsConfigured) {
   app.use(passport.session());
 }
 
+var proxies = {
+  proxy: {
+    forward: {
+      '/asset-template-service/(.*)': 'http://predix-pae-asset-ingestion-api.run.aws-usw02-pr.ice.predix.io' + '/$1'
+    }
+  }
+};
+app.use(require('json-proxy').initialize(proxies));
+
+
 //Initializing application modules
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -177,14 +187,14 @@ app.get('/templates', function (req, res) {
             "attributes": [
               "address"
             ],
-            "parent": "GE"
+            "parent": ["GE"]
           },
           {
             "name": "parking",
             "attributes": [
               "type"
             ],
-            "parent": "building"
+            "parent": ["building"]
           }
         ]
       },
@@ -204,14 +214,14 @@ app.get('/templates', function (req, res) {
             "attributes": [
               "address"
             ],
-            "parent": "FSoft"
+            "parent": ["FSoft"]
           },
           {
             "name": "BU",
             "attributes": [
               "type"
             ],
-            "parent": "FSU"
+            "parent": ["FSU"]
           }
         ]
       }
